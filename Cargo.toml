@@ -1,0 +1,11 @@
+[package]
+name = "test-app-rust-cargo"
+version = "0.1.0"
+description = "A test app for rust using cargo"
+readme = "README.md"
+homepage = "https://github.com/cidverse/test-app-rust-cargo"
+repository = "https://github.com/cidverse/test-app-rust-cargo"
+license = "MIT"
+edition = "2021"
+
+[dependencies]
