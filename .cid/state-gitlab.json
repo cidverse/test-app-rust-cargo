@@ -1,0 +1,1828 @@
+{
+  "workflows": {
+    "Nightly": {
+      "version": "0.5.0",
+      "name": "Nightly",
+      "name_slug": "nightly",
+      "job_timeout": 10,
+      "default_branch": "main",
+      "workflow_key": "nightly",
+      "workflow_config": {
+        "type": "nightly",
+        "trigger_manual": true,
+        "trigger_cron": true,
+        "trigger_cron_schedule": "57 0 * * 4",
+        "environment_pattern": "nightly-.*"
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "cargo-build [test-app-rust-cargo]",
+            "slug": "cargo-build-test-app-rust-cargo",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/cargo-build",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "cargo-test [test-app-rust-cargo]",
+            "slug": "cargo-test-test-app-rust-cargo",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/cargo-test",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "crates.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 4
+          },
+          {
+            "id": "5",
+            "name": "zizmor-scan",
+            "slug": "zizmor-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/zizmor-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "GH_HOSTNAME",
+                  "description": "GH_HOSTNAME is required for some online audits"
+                },
+                {
+                  "name": "GH_TOKEN",
+                  "description": "GH_TOKEN is required for some online audits"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "zizmor",
+                  "constraint": "=\u003e 1.4.1"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 5
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "cid": {
+          "id": "cid",
+          "type": "binary",
+          "version": "0.5.0"
+        },
+        "quay.io/podman/stable": {
+          "id": "quay.io/podman/stable",
+          "type": "oci-container",
+          "version": "v5.4.2-immutable",
+          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS"
+      ]
+    },
+    "Pull Request": {
+      "version": "0.5.0",
+      "name": "Pull Request",
+      "name_slug": "pull-request",
+      "job_timeout": 10,
+      "default_branch": "main",
+      "workflow_key": "pull-request",
+      "workflow_config": {
+        "type": "pull-request",
+        "trigger_pull_request": true,
+        "environment_pattern": "pr-.*"
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "cargo-build [test-app-rust-cargo]",
+            "slug": "cargo-build-test-app-rust-cargo",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/cargo-build",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "cargo-test [test-app-rust-cargo]",
+            "slug": "cargo-test-test-app-rust-cargo",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/cargo-test",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "crates.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 4
+          },
+          {
+            "id": "5",
+            "name": "zizmor-scan",
+            "slug": "zizmor-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/zizmor-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "GH_HOSTNAME",
+                  "description": "GH_HOSTNAME is required for some online audits"
+                },
+                {
+                  "name": "GH_TOKEN",
+                  "description": "GH_TOKEN is required for some online audits"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "zizmor",
+                  "constraint": "=\u003e 1.4.1"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 5
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "cid": {
+          "id": "cid",
+          "type": "binary",
+          "version": "0.5.0"
+        },
+        "quay.io/podman/stable": {
+          "id": "quay.io/podman/stable",
+          "type": "oci-container",
+          "version": "v5.4.2-immutable",
+          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS"
+      ]
+    },
+    "Release": {
+      "version": "0.5.0",
+      "name": "Release",
+      "name_slug": "release",
+      "job_timeout": 10,
+      "default_branch": "main",
+      "workflow_key": "release",
+      "workflow_config": {
+        "type": "release",
+        "trigger_manual": true,
+        "trigger_push": true,
+        "trigger_push_tags": [
+          "v[0-9]+.[0-9]+.[0-9]+"
+        ],
+        "environment_pattern": "release-.*"
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan",
+          "publish"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "cargo-build [test-app-rust-cargo]",
+            "slug": "cargo-build-test-app-rust-cargo",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/cargo-build",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "cargo-test [test-app-rust-cargo]",
+            "slug": "cargo-test-test-app-rust-cargo",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/cargo-test",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "crates.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 4
+          },
+          {
+            "id": "5",
+            "name": "zizmor-scan",
+            "slug": "zizmor-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/zizmor-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "GH_HOSTNAME",
+                  "description": "GH_HOSTNAME is required for some online audits"
+                },
+                {
+                  "name": "GH_TOKEN",
+                  "description": "GH_TOKEN is required for some online audits"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "zizmor",
+                  "constraint": "=\u003e 1.4.1"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 5
+          },
+          {
+            "id": "6",
+            "name": "changelog-generate",
+            "slug": "changelog-generate",
+            "stage": "publish",
+            "scope": "project",
+            "action": "container://ghcr.io/cidverse/cid-actions-go:0.1.0+changelog-generate",
+            "run-after": [
+              "cargo-build-test-app-rust-cargo",
+              "cargo-test-test-app-rust-cargo",
+              "gitleaks-scan",
+              "semgrep-scan",
+              "trivyfs-scan",
+              "zizmor-scan"
+            ],
+            "run-after-by-name": [
+              "cargo-build [test-app-rust-cargo]",
+              "cargo-test [test-app-rust-cargo]",
+              "gitleaks-scan",
+              "semgrep-scan",
+              "trivyfs-scan",
+              "zizmor-scan"
+            ],
+            "access": {
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "changelog"
+                }
+              ]
+            },
+            "order": 6
+          },
+          {
+            "id": "7",
+            "name": "gitlab-release-publish",
+            "slug": "gitlab-release-publish",
+            "stage": "publish",
+            "scope": "project",
+            "action": "builtin://actions/gitlab-release-publish",
+            "run-after": [
+              "cargo-build-test-app-rust-cargo",
+              "cargo-test-test-app-rust-cargo",
+              "changelog-generate",
+              "gitleaks-scan",
+              "semgrep-scan",
+              "trivyfs-scan",
+              "zizmor-scan"
+            ],
+            "run-after-by-name": [
+              "cargo-build [test-app-rust-cargo]",
+              "cargo-test [test-app-rust-cargo]",
+              "changelog-generate",
+              "gitleaks-scan",
+              "semgrep-scan",
+              "trivyfs-scan",
+              "zizmor-scan"
+            ],
+            "uses-output-of": [
+              "cargo-build-test-app-rust-cargo",
+              "changelog-generate"
+            ],
+            "uses-output-of-by-name": [
+              "cargo-build [test-app-rust-cargo]",
+              "changelog-generate"
+            ],
+            "access": {
+              "env": [
+                {
+                  "name": "CI_JOB_TOKEN",
+                  "description": "The GitLab job token to use for authentication. Preferred over personal access tokens.",
+                  "secret": true
+                },
+                {
+                  "name": "GITLAB_TOKEN",
+                  "description": "The GitLab token to use for creating the release when using a personal access token."
+                },
+                {
+                  "name": "GITLAB_BOT_TOKEN",
+                  "description": "The GitLab token to use for creating the release when using a project bot account."
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {
+              "artifacts": [
+                {
+                  "type": "changelog"
+                },
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "outputs": {},
+            "order": 7
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "cid": {
+          "id": "cid",
+          "type": "binary",
+          "version": "0.5.0"
+        },
+        "quay.io/podman/stable": {
+          "id": "quay.io/podman/stable",
+          "type": "oci-container",
+          "version": "v5.4.2-immutable",
+          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS"
+      ]
+    },
+    "Main": {
+      "version": "0.5.0",
+      "name": "Main",
+      "name_slug": "main",
+      "job_timeout": 10,
+      "default_branch": "main",
+      "workflow_key": "main",
+      "workflow_config": {
+        "type": "main",
+        "trigger_manual": true,
+        "trigger_push": true,
+        "trigger_push_branches": [
+          "main"
+        ]
+      },
+      "plan": {
+        "name": "main",
+        "stages": [
+          "build",
+          "test",
+          "scan"
+        ],
+        "steps": [
+          {
+            "id": "0",
+            "name": "cargo-build [test-app-rust-cargo]",
+            "slug": "cargo-build-test-app-rust-cargo",
+            "stage": "build",
+            "scope": "module",
+            "action": "builtin://actions/cargo-build",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "binary"
+                }
+              ]
+            },
+            "order": 0
+          },
+          {
+            "id": "1",
+            "name": "cargo-test [test-app-rust-cargo]",
+            "slug": "cargo-test-test-app-rust-cargo",
+            "stage": "test",
+            "scope": "module",
+            "action": "builtin://actions/cargo-test",
+            "module": "cargo-cargo-toml",
+            "access": {
+              "executables": [
+                {
+                  "name": "cargo",
+                  "constraint": "\u003e= 0.0.0-0"
+                }
+              ],
+              "network": [
+                {
+                  "host": "crates.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "junit"
+                }
+              ]
+            },
+            "order": 1
+          },
+          {
+            "id": "2",
+            "name": "gitleaks-scan",
+            "slug": "gitleaks-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/gitleaks-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "gitleaks",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 2
+          },
+          {
+            "id": "3",
+            "name": "semgrep-scan",
+            "slug": "semgrep-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/semgrep-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "SEMGREP_RULES",
+                  "description": "See option --config."
+                },
+                {
+                  "name": "SEMGREP_APP_TOKEN",
+                  "description": "Semgrep AppSec Platform Token",
+                  "secret": true
+                }
+              ],
+              "executables": [
+                {
+                  "name": "semgrep",
+                  "constraint": "\u003e= 0.0.0-0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "semgrep.dev:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 3
+          },
+          {
+            "id": "4",
+            "name": "trivyfs-scan",
+            "slug": "trivyfs-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/trivyfs-scan",
+            "access": {
+              "executables": [
+                {
+                  "name": "trivy",
+                  "constraint": "=\u003e 0.61.0"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "mirror.gcr.io:443"
+                },
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 4
+          },
+          {
+            "id": "5",
+            "name": "zizmor-scan",
+            "slug": "zizmor-scan",
+            "stage": "scan",
+            "scope": "project",
+            "action": "builtin://actions/zizmor-scan",
+            "access": {
+              "env": [
+                {
+                  "name": "GH_HOSTNAME",
+                  "description": "GH_HOSTNAME is required for some online audits"
+                },
+                {
+                  "name": "GH_TOKEN",
+                  "description": "GH_TOKEN is required for some online audits"
+                }
+              ],
+              "executables": [
+                {
+                  "name": "zizmor",
+                  "constraint": "=\u003e 1.4.1"
+                },
+                {
+                  "name": "gitlab-sarif-converter"
+                }
+              ],
+              "network": [
+                {
+                  "host": "github.com:443"
+                },
+                {
+                  "host": "api.github.com:443"
+                },
+                {
+                  "host": "codeload.github.com:443"
+                },
+                {
+                  "host": "uploads.github.com:443"
+                },
+                {
+                  "host": "objects.githubusercontent.com:443"
+                },
+                {
+                  "host": "raw.githubusercontent.com:443"
+                },
+                {
+                  "host": "ghcr.io:443"
+                },
+                {
+                  "host": "pkg-containers.githubusercontent.com:443"
+                }
+              ]
+            },
+            "inputs": {},
+            "outputs": {
+              "artifacts": [
+                {
+                  "type": "report",
+                  "format": "sarif"
+                },
+                {
+                  "type": "report",
+                  "format": "gl-codequality"
+                }
+              ]
+            },
+            "order": 5
+          }
+        ]
+      },
+      "workflow_dependency": {
+        "cid": {
+          "id": "cid",
+          "type": "binary",
+          "version": "0.5.0"
+        },
+        "quay.io/podman/stable": {
+          "id": "quay.io/podman/stable",
+          "type": "oci-container",
+          "version": "v5.4.2-immutable",
+          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        }
+      },
+      "ignore_files": [
+        "README.md",
+        "LICENSE",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        "renovate.json",
+        "CODEOWNERS"
+      ]
+    }
+  }
+}
