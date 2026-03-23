@@ -1,11 +1,12 @@
 {
   "workflows": {
     "Nightly": {
-      "version": "0.5.0",
+      "version": "0.9.0",
       "name": "Nightly",
       "name_slug": "nightly",
       "job_timeout": 10,
       "default_branch": "main",
+      "container_runtime": "podman",
       "workflow_key": "nightly",
       "workflow_config": {
         "type": "nightly",
@@ -30,6 +31,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-build",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -82,6 +84,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-test",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -323,89 +326,21 @@
               ]
             },
             "order": 4
-          },
-          {
-            "id": "5",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                },
-                {
-                  "name": "gitlab-sarif-converter"
-                }
-              ],
-              "network": [
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                },
-                {
-                  "type": "report",
-                  "format": "gl-codequality"
-                }
-              ]
-            },
-            "order": 5
           }
         ]
       },
       "workflow_dependency": {
-        "cid": {
-          "id": "cid",
-          "type": "binary",
-          "version": "0.5.0"
+        "pkg:docker/podman/stable?repository_url=quay.io": {
+          "id": "podman/stable",
+          "type": "docker",
+          "version": "v5.8.1-immutable",
+          "hash": "42d8b3d789333f07e631305325a02b4ab33c3f107413e04b612973a72f1d7deb",
+          "repository": "quay.io"
         },
-        "quay.io/podman/stable": {
-          "id": "quay.io/podman/stable",
-          "type": "oci-container",
-          "version": "v5.4.2-immutable",
-          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.9.0"
         }
       },
       "ignore_files": [
@@ -415,15 +350,17 @@
         ".gitattributes",
         ".editorconfig",
         "renovate.json",
-        "CODEOWNERS"
+        "CODEOWNERS",
+        "SECURITY.md"
       ]
     },
     "Pull Request": {
-      "version": "0.5.0",
+      "version": "0.9.0",
       "name": "Pull Request",
       "name_slug": "pull-request",
       "job_timeout": 10,
       "default_branch": "main",
+      "container_runtime": "podman",
       "workflow_key": "pull-request",
       "workflow_config": {
         "type": "pull-request",
@@ -446,6 +383,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-build",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -498,6 +436,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-test",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -739,89 +678,21 @@
               ]
             },
             "order": 4
-          },
-          {
-            "id": "5",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                },
-                {
-                  "name": "gitlab-sarif-converter"
-                }
-              ],
-              "network": [
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                },
-                {
-                  "type": "report",
-                  "format": "gl-codequality"
-                }
-              ]
-            },
-            "order": 5
           }
         ]
       },
       "workflow_dependency": {
-        "cid": {
-          "id": "cid",
-          "type": "binary",
-          "version": "0.5.0"
+        "pkg:docker/podman/stable?repository_url=quay.io": {
+          "id": "podman/stable",
+          "type": "docker",
+          "version": "v5.8.1-immutable",
+          "hash": "42d8b3d789333f07e631305325a02b4ab33c3f107413e04b612973a72f1d7deb",
+          "repository": "quay.io"
         },
-        "quay.io/podman/stable": {
-          "id": "quay.io/podman/stable",
-          "type": "oci-container",
-          "version": "v5.4.2-immutable",
-          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.9.0"
         }
       },
       "ignore_files": [
@@ -831,15 +702,17 @@
         ".gitattributes",
         ".editorconfig",
         "renovate.json",
-        "CODEOWNERS"
+        "CODEOWNERS",
+        "SECURITY.md"
       ]
     },
     "Release": {
-      "version": "0.5.0",
+      "version": "0.9.0",
       "name": "Release",
       "name_slug": "release",
       "job_timeout": 10,
       "default_branch": "main",
+      "container_runtime": "podman",
       "workflow_key": "release",
       "workflow_config": {
         "type": "release",
@@ -867,6 +740,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-build",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -919,6 +793,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-test",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -1163,95 +1038,24 @@
           },
           {
             "id": "5",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                },
-                {
-                  "name": "gitlab-sarif-converter"
-                }
-              ],
-              "network": [
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                },
-                {
-                  "type": "report",
-                  "format": "gl-codequality"
-                }
-              ]
-            },
-            "order": 5
-          },
-          {
-            "id": "6",
             "name": "changelog-generate",
             "slug": "changelog-generate",
             "stage": "publish",
             "scope": "project",
-            "action": "container://ghcr.io/cidverse/cid-actions-go:0.1.0+changelog-generate",
+            "action": "builtin://actions/changelog-generate",
             "run-after": [
               "cargo-build-test-app-rust-cargo",
               "cargo-test-test-app-rust-cargo",
               "gitleaks-scan",
               "semgrep-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
               "cargo-build [test-app-rust-cargo]",
               "cargo-test [test-app-rust-cargo]",
               "gitleaks-scan",
               "semgrep-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
             "access": {
               "network": [
@@ -1289,10 +1093,10 @@
                 }
               ]
             },
-            "order": 6
+            "order": 5
           },
           {
-            "id": "7",
+            "id": "6",
             "name": "gitlab-release-publish",
             "slug": "gitlab-release-publish",
             "stage": "publish",
@@ -1304,8 +1108,7 @@
               "changelog-generate",
               "gitleaks-scan",
               "semgrep-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
             "run-after-by-name": [
               "cargo-build [test-app-rust-cargo]",
@@ -1313,8 +1116,7 @@
               "changelog-generate",
               "gitleaks-scan",
               "semgrep-scan",
-              "trivyfs-scan",
-              "zizmor-scan"
+              "trivyfs-scan"
             ],
             "uses-output-of": [
               "cargo-build-test-app-rust-cargo",
@@ -1378,21 +1180,22 @@
               ]
             },
             "outputs": {},
-            "order": 7
+            "order": 6
           }
         ]
       },
       "workflow_dependency": {
-        "cid": {
-          "id": "cid",
-          "type": "binary",
-          "version": "0.5.0"
+        "pkg:docker/podman/stable?repository_url=quay.io": {
+          "id": "podman/stable",
+          "type": "docker",
+          "version": "v5.8.1-immutable",
+          "hash": "42d8b3d789333f07e631305325a02b4ab33c3f107413e04b612973a72f1d7deb",
+          "repository": "quay.io"
         },
-        "quay.io/podman/stable": {
-          "id": "quay.io/podman/stable",
-          "type": "oci-container",
-          "version": "v5.4.2-immutable",
-          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.9.0"
         }
       },
       "ignore_files": [
@@ -1402,15 +1205,17 @@
         ".gitattributes",
         ".editorconfig",
         "renovate.json",
-        "CODEOWNERS"
+        "CODEOWNERS",
+        "SECURITY.md"
       ]
     },
     "Main": {
-      "version": "0.5.0",
+      "version": "0.9.0",
       "name": "Main",
       "name_slug": "main",
       "job_timeout": 10,
       "default_branch": "main",
+      "container_runtime": "podman",
       "workflow_key": "main",
       "workflow_config": {
         "type": "main",
@@ -1436,6 +1241,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-build",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -1488,6 +1294,7 @@
             "scope": "module",
             "action": "builtin://actions/cargo-test",
             "module": "cargo-cargo-toml",
+            "module-dir": ".",
             "access": {
               "executables": [
                 {
@@ -1729,89 +1536,21 @@
               ]
             },
             "order": 4
-          },
-          {
-            "id": "5",
-            "name": "zizmor-scan",
-            "slug": "zizmor-scan",
-            "stage": "scan",
-            "scope": "project",
-            "action": "builtin://actions/zizmor-scan",
-            "access": {
-              "env": [
-                {
-                  "name": "GH_HOSTNAME",
-                  "description": "GH_HOSTNAME is required for some online audits"
-                },
-                {
-                  "name": "GH_TOKEN",
-                  "description": "GH_TOKEN is required for some online audits"
-                }
-              ],
-              "executables": [
-                {
-                  "name": "zizmor",
-                  "constraint": "=\u003e 1.4.1"
-                },
-                {
-                  "name": "gitlab-sarif-converter"
-                }
-              ],
-              "network": [
-                {
-                  "host": "github.com:443"
-                },
-                {
-                  "host": "api.github.com:443"
-                },
-                {
-                  "host": "codeload.github.com:443"
-                },
-                {
-                  "host": "uploads.github.com:443"
-                },
-                {
-                  "host": "objects.githubusercontent.com:443"
-                },
-                {
-                  "host": "raw.githubusercontent.com:443"
-                },
-                {
-                  "host": "ghcr.io:443"
-                },
-                {
-                  "host": "pkg-containers.githubusercontent.com:443"
-                }
-              ]
-            },
-            "inputs": {},
-            "outputs": {
-              "artifacts": [
-                {
-                  "type": "report",
-                  "format": "sarif"
-                },
-                {
-                  "type": "report",
-                  "format": "gl-codequality"
-                }
-              ]
-            },
-            "order": 5
           }
         ]
       },
       "workflow_dependency": {
-        "cid": {
-          "id": "cid",
-          "type": "binary",
-          "version": "0.5.0"
+        "pkg:docker/podman/stable?repository_url=quay.io": {
+          "id": "podman/stable",
+          "type": "docker",
+          "version": "v5.8.1-immutable",
+          "hash": "42d8b3d789333f07e631305325a02b4ab33c3f107413e04b612973a72f1d7deb",
+          "repository": "quay.io"
         },
-        "quay.io/podman/stable": {
-          "id": "quay.io/podman/stable",
-          "type": "oci-container",
-          "version": "v5.4.2-immutable",
-          "hash": "642704dd0bcd909b722a06e0dbe199bc74163047886c3d5c869fe2c0d8e3d4d5"
+        "pkg:github/cidverse/cid": {
+          "id": "cidverse/cid",
+          "type": "github",
+          "version": "0.9.0"
         }
       },
       "ignore_files": [
@@ -1821,7 +1560,8 @@
         ".gitattributes",
         ".editorconfig",
         "renovate.json",
-        "CODEOWNERS"
+        "CODEOWNERS",
+        "SECURITY.md"
       ]
     }
   }
